@@ -1,5 +1,7 @@
 package br.com.zup.desafioproposta.model;
 
+import br.com.zup.desafioproposta.service.analiseCredito.AnaliseCreditoRequest;
+
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
@@ -25,6 +27,9 @@ public class Proposta {
     @NotNull
     private BigDecimal salario;
 
+    @Enumerated(EnumType.STRING)
+    private EstadoProposta estadoProposta;
+
     public Proposta(String documento, String email, String nome, Endereco endereco, BigDecimal salario) {
         this.documento = documento;
         this.email = email;
@@ -42,6 +47,7 @@ public class Proposta {
                 ", nome='" + nome + '\'' +
                 ", endereco=" + endereco +
                 ", salario=" + salario +
+                ", estadoProposta=" + estadoProposta +
                 '}';
     }
 
@@ -52,4 +58,21 @@ public class Proposta {
     public Long getId() {
         return id;
     }
+
+    public void tornaClienteElegivel() {
+        this.estadoProposta = EstadoProposta.ELEGIVEL;
+    }
+
+    public void tornaClienteInelegivel() {
+        this.estadoProposta = EstadoProposta.NAO_ELEGIVEL;
+    }
+
+    public AnaliseCreditoRequest toAnaliseDeCredito() {
+        return new AnaliseCreditoRequest(
+                documento,
+                nome,
+                String.valueOf(id)
+        );
+    }
+
 }
