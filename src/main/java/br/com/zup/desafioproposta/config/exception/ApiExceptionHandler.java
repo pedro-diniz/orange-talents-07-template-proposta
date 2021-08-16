@@ -58,6 +58,20 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, problema, new HttpHeaders(), status, request);
     }
 
+    @ExceptionHandler(EntidadeImprocessavelException.class)
+    public ResponseEntity<Object> handleEntidadeImprocessavel(EntidadeImprocessavelException ex, WebRequest request) {
+
+        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+
+        Problema problema = new Problema(
+                status.value(),
+                OffsetDateTime.now(),
+                ex.getMessage()
+        );
+
+        return handleExceptionInternal(ex, problema, new HttpHeaders(), status, request);
+    }
+
     // Constrói o ValidationErrorOutputDto a partir das listas de erros
     public ValidationErrorOutputDto buildValidationErrors(
             List<ObjectError> globalErrors, List<FieldError> fieldErrors) {
