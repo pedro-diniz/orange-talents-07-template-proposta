@@ -1,6 +1,7 @@
 package br.com.zup.desafioproposta.model;
 
 import br.com.zup.desafioproposta.service.analiseCredito.AnaliseCreditoRequest;
+import br.com.zup.desafioproposta.service.associaCartao.AssociaCartaoRequest;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -75,4 +76,14 @@ public class Proposta {
         );
     }
 
+    public AssociaCartaoRequest toAssociacao() {
+        return new AssociaCartaoRequest(
+                documento,
+                nome,
+                String.valueOf(id)
+        );
+    }
+
+    public Proposta() {
+    }
 }

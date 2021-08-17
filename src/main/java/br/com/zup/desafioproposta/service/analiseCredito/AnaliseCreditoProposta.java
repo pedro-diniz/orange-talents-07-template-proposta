@@ -32,4 +32,12 @@ public class AnaliseCreditoProposta {
     public String getIdProposta() {
         return idProposta;
     }
+
+    public AnaliseCreditoProposta(String documento, String nome, ResultadoSolicitacao resultadoSolicitacao,
+                                  String idProposta) {
+        this.documento = documento;
+        this.nome = nome;
+        this.resultadoSolicitacao = resultadoSolicitacao;
+        this.idProposta = idProposta;
+    }
 }

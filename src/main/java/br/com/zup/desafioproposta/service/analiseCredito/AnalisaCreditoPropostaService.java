@@ -1,5 +1,6 @@
 package br.com.zup.desafioproposta.service.analiseCredito;
 
+import br.com.zup.desafioproposta.config.exception.NegocioException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -9,11 +10,22 @@ public class AnalisaCreditoPropostaService {
     public AnaliseCreditoProposta analisaCredito(AnaliseCreditoRequest request) {
 
         String analiseCreditoUrl = "http://localhost:9999/api/solicitacao";
-        RestTemplate restTemplate = new RestTemplate();
-        AnaliseCreditoProposta analiseCreditoProposta = restTemplate.postForObject(
-                analiseCreditoUrl, request, AnaliseCreditoProposta.class);
 
-        return analiseCreditoProposta;
+        // Cria a HTTP request para Análise de Crédito a partir da Proposta não analisada
+            // e recebe um # de cartão referente àquela proposta
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            AnaliseCreditoPropostaResponse analiseResponse = restTemplate.postForObject(
+                    analiseCreditoUrl, request, AnaliseCreditoPropostaResponse.class);
+
+            AnaliseCreditoProposta analise = analiseResponse.toEntity();
+
+            return analise;
+
+        }
+        catch (Exception e) {
+            throw new NegocioException("Conexão recusada com o sistema de análise de crédito");
+        }
 
     }
 
