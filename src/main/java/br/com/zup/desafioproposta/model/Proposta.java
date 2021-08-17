@@ -1,5 +1,6 @@
 package br.com.zup.desafioproposta.model;
 
+import br.com.zup.desafioproposta.controller.dto.response.PropostaResponse;
 import br.com.zup.desafioproposta.service.analiseCredito.AnaliseCreditoRequest;
 import br.com.zup.desafioproposta.service.associaCartao.AssociaCartaoRequest;
 
@@ -85,5 +86,16 @@ public class Proposta {
     }
 
     public Proposta() {
+    }
+
+    public PropostaResponse toResponse() {
+        return new PropostaResponse(
+                documento,
+                email,
+                nome,
+                endereco,
+                salario,
+                estadoProposta
+        );
     }
 }

@@ -6,7 +6,7 @@ import javax.persistence.Embeddable;
 import javax.validation.constraints.NotBlank;
 
 @Embeddable
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Endereco {
 
     @NotBlank

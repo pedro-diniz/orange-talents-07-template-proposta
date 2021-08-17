@@ -1,6 +1,6 @@
 package br.com.zup.desafioproposta.service.analiseCredito;
 
-import br.com.zup.desafioproposta.config.exception.NegocioException;
+import br.com.zup.desafioproposta.config.exception.ServicoIndisponivelException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,7 +24,7 @@ public class AnalisaCreditoPropostaService {
 
         }
         catch (Exception e) {
-            throw new NegocioException("Conexão recusada com o sistema de análise de crédito");
+            throw new ServicoIndisponivelException("Conexão recusada com o sistema de análise de crédito");
         }
 
     }

@@ -1,6 +1,6 @@
 package br.com.zup.desafioproposta.service.associaCartao;
 
-import br.com.zup.desafioproposta.config.exception.NegocioException;
+import br.com.zup.desafioproposta.config.exception.ServicoIndisponivelException;
 import br.com.zup.desafioproposta.model.Cartao;
 import br.com.zup.desafioproposta.model.Proposta;
 import br.com.zup.desafioproposta.repository.CartaoRepository;
@@ -48,7 +48,7 @@ public class AssociaCartaoService {
 
             }
             catch (Exception e) {
-                throw new NegocioException("Conexão recusada com o sistema de cartões de crédito");
+                throw new ServicoIndisponivelException("Conexão recusada com o sistema de cartões de crédito");
             }
         }
 

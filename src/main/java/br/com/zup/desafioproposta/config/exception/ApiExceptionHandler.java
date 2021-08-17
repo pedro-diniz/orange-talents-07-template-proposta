@@ -72,6 +72,20 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, problema, new HttpHeaders(), status, request);
     }
 
+    @ExceptionHandler(ServicoIndisponivelException.class)
+    public ResponseEntity<Object> handleServicoIndisponivel(ServicoIndisponivelException ex, WebRequest request) {
+
+        HttpStatus status = HttpStatus.SERVICE_UNAVAILABLE;
+
+        Problema problema = new Problema(
+                status.value(),
+                OffsetDateTime.now(),
+                ex.getMessage()
+        );
+
+        return handleExceptionInternal(ex, problema, new HttpHeaders(), status, request);
+    }
+
     // Constrói o ValidationErrorOutputDto a partir das listas de erros
     public ValidationErrorOutputDto buildValidationErrors(
             List<ObjectError> globalErrors, List<FieldError> fieldErrors) {

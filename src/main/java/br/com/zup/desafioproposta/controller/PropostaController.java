@@ -7,13 +7,12 @@ import br.com.zup.desafioproposta.service.analiseCredito.ResultadoSolicitacao;
 import br.com.zup.desafioproposta.repository.PropostaRepository;
 import br.com.zup.desafioproposta.service.analiseCredito.AnalisaCreditoPropostaService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/propostas")
@@ -47,6 +46,20 @@ public class PropostaController {
         return ResponseEntity.created(
                 uriBuilder.path("/propostas/{id}").buildAndExpand(proposta.getId()).toUri())
                 .build();
+
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> detalhar(@PathVariable @NotNull Long id) {
+        Optional<Proposta> possivelProposta = propostaRepository.findById(id);
+
+        if (possivelProposta.isPresent()) {
+            return ResponseEntity.ok(possivelProposta.get().toResponse());
+        }
+
+        else {
+            return ResponseEntity.notFound().build();
+        }
 
     }
 }
