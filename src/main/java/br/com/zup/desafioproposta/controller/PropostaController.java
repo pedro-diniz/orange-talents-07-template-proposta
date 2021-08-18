@@ -6,6 +6,7 @@ import br.com.zup.desafioproposta.model.Proposta;
 import br.com.zup.desafioproposta.service.analiseCredito.ResultadoSolicitacao;
 import br.com.zup.desafioproposta.repository.PropostaRepository;
 import br.com.zup.desafioproposta.service.analiseCredito.AnalisaCreditoPropostaService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -28,7 +29,8 @@ public class PropostaController {
     }
 
     @PostMapping
-    public ResponseEntity<?> criar(@RequestBody @Valid PropostaRequest request, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<?> criar(@RequestBody @Valid PropostaRequest request, UriComponentsBuilder uriBuilder)
+            throws JsonProcessingException {
 
         Proposta proposta = request.toModel();
 

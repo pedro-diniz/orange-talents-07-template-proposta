@@ -22,6 +22,39 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
 
+  apipropostas:
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+    image: 'pedro/propostas'
+    ports:
+      - 8081:8080
+    environment:
+      # O Docker não conhece o localhost. A comunicação entre containers ocorre passando o nome do container
+        # no lugar no localhost. Mas, posso querer passar portas diferente também. Por que?
+          # Porque os containers não conseguem ver as portas atribuídas ao localhost!
+          # Ou seja, o Postgres só vai funcionar poder ser visto na porta 5432 pelos containers.
+          # Por isso, é interessante que passemos variáveis de ambiente com os endereços dos serviços
+          # E, quando não passarmos nenhuma variável, significa que estamos no localhost.
+            #Fazemos isso no application.properties
+      DATASOURCE_URL: jdbc:postgresql://postgres-propostas:5432/propostas
+      ASSOCIA_CARTAO_URL: http://contas:8888/api/cartoes
+      ANALISE_CREDITO_URL: http://analise:9999/api/solicitacao
+    depends_on:
+      - postgres-propostas
+
+  postgres-propostas:
+    image: 'postgres:9.6-alpine'
+    volumes:
+      - postgres-propostas-volume:/var/lib/postgresql/data
+    ports:
+      - 5433:5432 #porta_maquina_host:porta_do_container_do_docker
+    environment:
+      POSTGRES_USER: propostas
+      POSTGRES_PASSWORD: 12345678
+      POSTGRES_DB: propostas
+      POSTGRES_HOST: postgres-propostas
+
   postgres:
     image: 'postgres:9.6-alpine'
     volumes:
@@ -138,3 +171,4 @@ volumes:
   grafana-volume:
   prometheus-volume:
   postgres-volume:
+  postgres-propostas-volume:

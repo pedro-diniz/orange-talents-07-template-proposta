@@ -5,6 +5,7 @@ import br.com.zup.desafioproposta.model.Cartao;
 import br.com.zup.desafioproposta.model.Proposta;
 import br.com.zup.desafioproposta.repository.CartaoRepository;
 import br.com.zup.desafioproposta.repository.PropostaRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,10 @@ public class AssociaCartaoService {
     private PropostaRepository propostaRepository;
     private CartaoRepository cartaoRepository;
 
+    // variável de ambiente para diferenciar localhost dos endereços dos containers do docker
+    @Value("${associaCartaoApiUrl.urlCompleta}")
+    private String url;
+
     public AssociaCartaoService(PropostaRepository propostaRepository, CartaoRepository cartaoRepository) {
         this.propostaRepository = propostaRepository;
         this.cartaoRepository = cartaoRepository;
@@ -26,7 +31,6 @@ public class AssociaCartaoService {
     @Async
     @Scheduled(fixedRate = 60000)
     public void printaRecorrentemente() throws InterruptedException {
-        String url = "http://localhost:8888/api/cartoes";
 
         List<Proposta> propostas = propostaRepository.findByElegivelSemCartaoAssociado();
 
