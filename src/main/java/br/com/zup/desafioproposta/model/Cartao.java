@@ -40,6 +40,10 @@ public class Cartao {
     @OneToOne(cascade = CascadeType.MERGE)
     private Vencimento vencimento;
 
+    @OneToMany
+    @JoinColumn(name = "cartao_id")
+    private Set<Biometria> biometrias = new HashSet<>();
+
     private String idProposta;
 
     public Cartao() {
@@ -120,5 +124,9 @@ public class Cartao {
         this.renegociacao = renegociacao;
         this.vencimento = vencimento;
         this.idProposta = idProposta;
+    }
+
+    public Cartao(String id) {
+        this.id = id;
     }
 }
