@@ -1,29 +1,33 @@
 package br.com.zup.desafioproposta.service.associaCartao;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import java.time.OffsetDateTime;
+import br.com.zup.desafioproposta.model.Cartao;
+
+import javax.persistence.*;
+import java.time.Instant;
 
 @Entity
 public class Bloqueio {
 
     @Id
-    private String id;
-    private OffsetDateTime bloqueadoEm;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private Instant bloqueadoEm = Instant.now();
     private String sistemaResponsavel;
-    private Boolean ativo;
+    private Boolean ativo = true;
 
-    public Bloqueio(OffsetDateTime bloqueadoEm, String sistemaResponsavel, Boolean ativo) {
-        this.bloqueadoEm = bloqueadoEm;
+    @ManyToOne
+    private Cartao cartao;
+
+    public Bloqueio(String sistemaResponsavel, Cartao cartao) {
         this.sistemaResponsavel = sistemaResponsavel;
-        this.ativo = ativo;
+        this.cartao = cartao;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public OffsetDateTime getBloqueadoEm() {
+    public Instant getBloqueadoEm() {
         return bloqueadoEm;
     }
 

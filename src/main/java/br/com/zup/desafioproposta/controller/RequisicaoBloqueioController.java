@@ -4,10 +4,13 @@ import br.com.zup.desafioproposta.config.exception.EntidadeImprocessavelExceptio
 import br.com.zup.desafioproposta.config.exception.NaoEncontradaException;
 import br.com.zup.desafioproposta.config.exception.NegocioException;
 import br.com.zup.desafioproposta.model.Cartao;
+import br.com.zup.desafioproposta.model.EstadoCartao;
 import br.com.zup.desafioproposta.model.RequisicaoBloqueio;
 import br.com.zup.desafioproposta.repository.CartaoRepository;
 import br.com.zup.desafioproposta.repository.RequisicaoBloqueioRepository;
 import br.com.zup.desafioproposta.service.associaCartao.Bloqueio;
+import br.com.zup.desafioproposta.service.bloqueioLegadoCartao.BloqueiaLegadoCartaoService;
+import br.com.zup.desafioproposta.service.bloqueioLegadoCartao.BloqueioLegadoCartaoRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,11 +23,14 @@ public class RequisicaoBloqueioController {
 
     private CartaoRepository cartaoRepository;
     private RequisicaoBloqueioRepository requisicaoBloqueioRepository;
+    private BloqueiaLegadoCartaoService bloqueiaLegadoCartaoService;
 
     public RequisicaoBloqueioController(CartaoRepository cartaoRepository,
-                                        RequisicaoBloqueioRepository requisicaoBloqueioRepository) {
+                                        RequisicaoBloqueioRepository requisicaoBloqueioRepository,
+                                        BloqueiaLegadoCartaoService bloqueiaLegadoCartaoService) {
         this.cartaoRepository = cartaoRepository;
         this.requisicaoBloqueioRepository = requisicaoBloqueioRepository;
+        this.bloqueiaLegadoCartaoService = bloqueiaLegadoCartaoService;
     }
 
     @GetMapping("/cartoes/{idCartao}/requisicoesBloqueio")
@@ -39,7 +45,7 @@ public class RequisicaoBloqueioController {
                 () -> new NaoEncontradaException("Cartão não encontrado"));
 
         for(Bloqueio bloqueio: cartao.getBloqueios()) {
-            if (bloqueio.getAtivo()) {
+            if (bloqueio.getAtivo() || cartao.getEstadoCartao() == EstadoCartao.BLOQUEADO) {
                 throw new EntidadeImprocessavelException("Este cartão já está bloqueado");
             }
         }
@@ -51,6 +57,11 @@ public class RequisicaoBloqueioController {
         );
 
         requisicaoBloqueioRepository.save(requisicaoBloqueio);
+
+        Bloqueio bloqueio = bloqueiaLegadoCartaoService.bloqueioLegadoCartao(
+                new BloqueioLegadoCartaoRequest("desafio-proposta"), cartao);
+        cartao.bloqueia(bloqueio);
+        cartaoRepository.save(cartao);
 
         return ResponseEntity.ok().build();
 

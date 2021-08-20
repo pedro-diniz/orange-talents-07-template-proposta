@@ -46,6 +46,9 @@ public class Cartao {
 
     private String idProposta;
 
+    @Enumerated(EnumType.STRING)
+    private EstadoCartao estadoCartao;
+
     public Cartao() {
     }
 
@@ -93,6 +96,10 @@ public class Cartao {
         return idProposta;
     }
 
+    public EstadoCartao getEstadoCartao() {
+        return estadoCartao;
+    }
+
     @Override
     public String toString() {
         return "Cartao{" +
@@ -137,4 +144,10 @@ public class Cartao {
                 && idCartao.charAt(14) == '-'
                 && idCartao.replace("-","").chars().allMatch(Character::isDigit));
     }
+
+    public void bloqueia(Bloqueio bloqueio) {
+        bloqueios.add(bloqueio);
+        this.estadoCartao = EstadoCartao.BLOQUEADO;
+    }
+
 }
