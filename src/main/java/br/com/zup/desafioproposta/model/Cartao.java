@@ -129,4 +129,12 @@ public class Cartao {
     public Cartao(String id) {
         this.id = id;
     }
+
+    public static Boolean cartaoValido(String idCartao) {
+        return (idCartao.length() == 19
+                && idCartao.charAt(4) == '-'
+                && idCartao.charAt(9) == '-'
+                && idCartao.charAt(14) == '-'
+                && idCartao.replace("-","").chars().allMatch(Character::isDigit));
+    }
 }
