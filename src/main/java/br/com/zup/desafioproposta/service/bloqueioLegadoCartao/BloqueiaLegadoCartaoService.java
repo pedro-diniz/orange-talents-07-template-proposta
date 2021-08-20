@@ -6,7 +6,7 @@ import br.com.zup.desafioproposta.model.Cartao;
 import br.com.zup.desafioproposta.service.associaCartao.Bloqueio;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Objects;
@@ -38,7 +38,7 @@ public class BloqueiaLegadoCartaoService {
             }
         }
 
-        catch (HttpClientErrorException e) {
+        catch (HttpServerErrorException e) {
             throw new ServicoIndisponivelException("Conexão recusado com o sistema de bloqueio de cartões");
         }
 
