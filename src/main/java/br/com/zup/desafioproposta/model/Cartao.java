@@ -118,8 +118,8 @@ public class Cartao {
     }
 
     public Cartao(String id, String emitidoEm, String titular, Set<Bloqueio> bloqueios, Set<Aviso> avisos,
-                  Set<Carteira> carteiras, Set<Parcela> parcelas, Long limite, Renegociacao renegociacao,
-                  Vencimento vencimento, String idProposta) {
+                  Set<Carteira> carteiras, Set<Parcela> parcelas,
+                  Long limite, Renegociacao renegociacao, Vencimento vencimento, String idProposta) {
         this.id = id;
         this.emitidoEm = emitidoEm;
         this.titular = titular;
@@ -152,6 +152,10 @@ public class Cartao {
 
     public void adicionaAviso(Aviso aviso) {
         avisos.add(aviso);
+    }
+
+    public void vinculaCarteira(Carteira carteira) {
+        carteiras.add(carteira);
     }
 
 }

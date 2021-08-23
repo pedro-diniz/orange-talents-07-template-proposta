@@ -1,25 +1,31 @@
 package br.com.zup.desafioproposta.service.associaCartao;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import br.com.zup.desafioproposta.model.Cartao;
+
+import javax.persistence.*;
 import java.time.OffsetDateTime;
 
 @Entity
 public class Carteira {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String email;
-    private OffsetDateTime associadaEm;
+    private OffsetDateTime associadaEm = OffsetDateTime.now();
     private String emissor;
 
-    public Carteira(String email, OffsetDateTime associadaEm, String emissor) {
+    @ManyToOne
+    private Cartao cartao;
+
+    public Carteira(String email, String emissor, Cartao cartao) {
         this.email = email;
-        this.associadaEm = associadaEm;
         this.emissor = emissor;
+        this.cartao = cartao;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
