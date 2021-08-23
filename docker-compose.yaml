@@ -40,6 +40,7 @@ services:
       DATASOURCE_URL: jdbc:postgresql://postgres-propostas:5432/propostas
       ASSOCIA_CARTAO_URL: http://contas:8888/api/cartoes
       BLOQUEIA_CARTAO_URL: http://contas:8888/api/cartoes
+      AVISA_CARTAO_URL: http://contas:8888/api/cartoes
       ANALISE_CREDITO_URL: http://analise:9999/api/solicitacao
       KEYCLOAK_ISSUER_URI: http://keycloak:18080/auth/realms/nosso-cartao
       KEYCLOAK_JWKS_URI: http://keycloak:18080/auth/realms/nosso-cartao/protocol/openid-connect/certs

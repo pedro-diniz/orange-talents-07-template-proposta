@@ -7,6 +7,8 @@ import br.com.zup.desafioproposta.model.AvisoViagem;
 import br.com.zup.desafioproposta.model.Cartao;
 import br.com.zup.desafioproposta.repository.AvisoViagemRepository;
 import br.com.zup.desafioproposta.repository.CartaoRepository;
+import br.com.zup.desafioproposta.service.associaCartao.Aviso;
+import br.com.zup.desafioproposta.service.avisoLegadoCartao.AvisoLegadoCartaoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,10 +23,15 @@ public class AvisoViagemController {
 
     private CartaoRepository cartaoRepository;
     private AvisoViagemRepository avisoViagemRepository;
+    private AvisoLegadoCartaoService avisoLegadoCartaoService;
 
-    public AvisoViagemController(CartaoRepository cartaoRepository, AvisoViagemRepository avisoViagemRepository) {
+    public AvisoViagemController(CartaoRepository cartaoRepository,
+                                 AvisoViagemRepository avisoViagemRepository,
+                                 AvisoLegadoCartaoService avisoLegadoCartaoService) {
+
         this.cartaoRepository = cartaoRepository;
         this.avisoViagemRepository = avisoViagemRepository;
+        this.avisoLegadoCartaoService = avisoLegadoCartaoService;
     }
 
     @PostMapping("/cartoes/{idCartao}/viagens")
@@ -46,6 +53,11 @@ public class AvisoViagemController {
                 cartao);
 
         avisoViagemRepository.save(avisoViagem);
+
+        Aviso aviso = avisoLegadoCartaoService.avisoLegadoCartao(avisoViagemRequest.toLegadoRequest(), cartao);
+
+        cartao.adicionaAviso(aviso);
+        cartaoRepository.save(cartao);
 
         return ResponseEntity.ok().build();
     }

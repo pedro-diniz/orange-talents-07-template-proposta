@@ -150,4 +150,8 @@ public class Cartao {
         this.estadoCartao = EstadoCartao.BLOQUEADO;
     }
 
+    public void adicionaAviso(Aviso aviso) {
+        avisos.add(aviso);
+    }
+
 }
