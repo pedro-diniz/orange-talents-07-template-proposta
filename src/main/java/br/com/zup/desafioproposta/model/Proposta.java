@@ -3,6 +3,7 @@ package br.com.zup.desafioproposta.model;
 import br.com.zup.desafioproposta.controller.dto.response.PropostaResponse;
 import br.com.zup.desafioproposta.service.analiseCredito.AnaliseCreditoRequest;
 import br.com.zup.desafioproposta.service.associaCartao.AssociaCartaoRequest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -33,7 +34,7 @@ public class Proposta {
     private EstadoProposta estadoProposta;
 
     public Proposta(String documento, String email, String nome, Endereco endereco, BigDecimal salario) {
-        this.documento = documento;
+        this.documento = encoda(documento);
         this.email = email;
         this.nome = nome;
         this.endereco = endereco;
@@ -97,5 +98,9 @@ public class Proposta {
                 salario,
                 estadoProposta
         );
+    }
+
+    private String encoda(String documento) {
+        return new BCryptPasswordEncoder().encode(documento);
     }
 }
