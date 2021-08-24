@@ -45,6 +45,9 @@ services:
       ANALISE_CREDITO_URL: http://analise:9999/api/solicitacao
       KEYCLOAK_ISSUER_URI: http://keycloak:18080/auth/realms/nosso-cartao
       KEYCLOAK_JWKS_URI: http://keycloak:18080/auth/realms/nosso-cartao/protocol/openid-connect/certs
+      NOME_DA_APLICACAO: desafio-proposta-container
+      AMBIENTE: container
+      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
     depends_on:
       - postgres-propostas
 
