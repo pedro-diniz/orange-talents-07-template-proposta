@@ -36,7 +36,14 @@ public class PropostaController {
 
         Proposta proposta = request.toModel();
 
-        AnaliseCreditoProposta analiseCredito = analisaCreditoPropostaService.analisaCredito(proposta.toAnaliseDeCredito());
+        ResponseEntity<?> possivelAnaliseCredito = analisaCreditoPropostaService.analisaCredito(
+                proposta.toAnaliseDeCredito());
+
+        if (possivelAnaliseCredito.getStatusCode() == HttpStatus.SERVICE_UNAVAILABLE) {
+            return possivelAnaliseCredito;
+        }
+
+        AnaliseCreditoProposta analiseCredito = (AnaliseCreditoProposta) possivelAnaliseCredito.getBody();
 
         if (analiseCredito.getResultadoSolicitacao() == ResultadoSolicitacao.SEM_RESTRICAO) {
             proposta.tornaClienteElegivel();

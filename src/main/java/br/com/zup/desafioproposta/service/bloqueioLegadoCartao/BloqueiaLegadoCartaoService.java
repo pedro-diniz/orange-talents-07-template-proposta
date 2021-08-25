@@ -1,12 +1,13 @@
 package br.com.zup.desafioproposta.service.bloqueioLegadoCartao;
 
-import br.com.zup.desafioproposta.config.exception.EntidadeImprocessavelException;
-import br.com.zup.desafioproposta.config.exception.ServicoIndisponivelException;
+import br.com.zup.desafioproposta.config.exception.Problema;
 import br.com.zup.desafioproposta.model.Cartao;
 import br.com.zup.desafioproposta.service.associaCartao.Bloqueio;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Objects;
@@ -18,7 +19,7 @@ public class BloqueiaLegadoCartaoService {
     @Value("${bloqueiaLegadoCartaoApiUrl.urlCompleta}")
     private String bloqueiaLegadoCartaoUrl;
 
-    public Bloqueio bloqueioLegadoCartao(BloqueioLegadoCartaoRequest request, Cartao cartao) {
+    public ResponseEntity<?> bloqueioLegadoCartao(BloqueioLegadoCartaoRequest request, Cartao cartao) {
 
         try {
 
@@ -31,15 +32,20 @@ public class BloqueiaLegadoCartaoService {
 
             assert response != null;
             if (Objects.equals(response.getResultado(), "BLOQUEADO")) {
-                return new Bloqueio(request.getSistemaResponsavel(), cartao);
+                return ResponseEntity.status(HttpStatus.OK).body(
+                        new Bloqueio(request.getSistemaResponsavel(), cartao));
             }
             else {
-                throw new EntidadeImprocessavelException("Este cartão já está bloqueado");
+                return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(
+                        new Problema(422, "Este cartão já está bloqueado")
+                );
             }
         }
 
-        catch (HttpServerErrorException e) {
-            throw new ServicoIndisponivelException("Conexão recusado com o sistema de bloqueio de cartões");
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(
+                    new Problema(503, "Conexão recusado com o sistema de bloqueio de cartões")
+            );
         }
 
     }

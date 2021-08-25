@@ -3,11 +3,11 @@ package br.com.zup.desafioproposta.model;
 import br.com.zup.desafioproposta.controller.dto.response.PropostaResponse;
 import br.com.zup.desafioproposta.service.analiseCredito.AnaliseCreditoRequest;
 import br.com.zup.desafioproposta.service.associaCartao.AssociaCartaoRequest;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
+import java.util.Base64;
 
 @Entity
 public class Proposta {
@@ -72,7 +72,7 @@ public class Proposta {
 
     public AnaliseCreditoRequest toAnaliseDeCredito() {
         return new AnaliseCreditoRequest(
-                documento,
+                decoda(documento),
                 nome,
                 String.valueOf(id)
         );
@@ -80,7 +80,7 @@ public class Proposta {
 
     public AssociaCartaoRequest toAssociacao() {
         return new AssociaCartaoRequest(
-                documento,
+                decoda(documento),
                 nome,
                 String.valueOf(id)
         );
@@ -91,7 +91,7 @@ public class Proposta {
 
     public PropostaResponse toResponse() {
         return new PropostaResponse(
-                documento,
+                decoda(documento),
                 email,
                 nome,
                 endereco,
@@ -101,6 +101,10 @@ public class Proposta {
     }
 
     private String encoda(String documento) {
-        return new BCryptPasswordEncoder().encode(documento);
+        return Base64.getEncoder().encodeToString(documento.getBytes());
+    }
+
+    private String decoda(String documento) {
+        return new String(Base64.getDecoder().decode(documento));
     }
 }

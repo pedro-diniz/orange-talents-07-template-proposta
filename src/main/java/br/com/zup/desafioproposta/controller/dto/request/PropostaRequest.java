@@ -1,6 +1,7 @@
 package br.com.zup.desafioproposta.controller.dto.request;
 
 import br.com.zup.desafioproposta.config.validation.CpfOuCnpj;
+import br.com.zup.desafioproposta.config.validation.UniqueDocument;
 import br.com.zup.desafioproposta.config.validation.UniqueValue;
 import br.com.zup.desafioproposta.model.Proposta;
 
@@ -10,8 +11,7 @@ import java.math.BigDecimal;
 
 public class PropostaRequest {
 
-    @NotBlank @CpfOuCnpj
-    @UniqueValue(domainClass = Proposta.class, fieldName = "documento")
+    @NotBlank @CpfOuCnpj @UniqueDocument
     private String documento;
 
     @NotBlank @Email

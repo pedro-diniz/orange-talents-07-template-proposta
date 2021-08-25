@@ -61,7 +61,14 @@ public class AvisoViagemController {
 
         avisoViagemRepository.save(avisoViagem);
 
-        Aviso aviso = avisoLegadoCartaoService.avisoLegadoCartao(avisoViagemRequest.toLegadoRequest(), cartao);
+        ResponseEntity possivelAviso = avisoLegadoCartaoService.avisoLegadoCartao(
+                avisoViagemRequest.toLegadoRequest(), cartao);
+
+        if (possivelAviso.getStatusCode() != HttpStatus.OK) {
+            return possivelAviso;
+        }
+
+        Aviso aviso = (Aviso) possivelAviso.getBody();
 
         cartao.adicionaAviso(aviso);
         cartaoRepository.save(cartao);
