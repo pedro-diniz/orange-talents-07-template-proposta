@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
 public class Problema {
 
     private Integer status;
-    private OffsetDateTime dataHora;
+    private OffsetDateTime dataHora = OffsetDateTime.now();
     private String titulo;
     private ValidationErrorOutputDto campos;
 
@@ -28,16 +28,14 @@ public class Problema {
         return campos;
     }
 
-    public Problema(Integer status, OffsetDateTime dataHora, String titulo, ValidationErrorOutputDto campos) {
+    public Problema(Integer status, String titulo, ValidationErrorOutputDto campos) {
         this.status = status;
-        this.dataHora = dataHora;
         this.titulo = titulo;
         this.campos = campos;
     }
 
-    public Problema(Integer status, OffsetDateTime dataHora, String titulo) {
+    public Problema(Integer status, String titulo) {
         this.status = status;
-        this.dataHora = dataHora;
         this.titulo = titulo;
     }
 

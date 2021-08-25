@@ -1,7 +1,6 @@
 package br.com.zup.desafioproposta.controller;
 
-import br.com.zup.desafioproposta.config.exception.NaoEncontradaException;
-import br.com.zup.desafioproposta.config.exception.NegocioException;
+import br.com.zup.desafioproposta.config.exception.Problema;
 import br.com.zup.desafioproposta.controller.dto.request.AvisoViagemRequest;
 import br.com.zup.desafioproposta.model.AvisoViagem;
 import br.com.zup.desafioproposta.model.Cartao;
@@ -9,6 +8,7 @@ import br.com.zup.desafioproposta.repository.AvisoViagemRepository;
 import br.com.zup.desafioproposta.repository.CartaoRepository;
 import br.com.zup.desafioproposta.service.associaCartao.Aviso;
 import br.com.zup.desafioproposta.service.avisoLegadoCartao.AvisoLegadoCartaoService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.Optional;
 
 @RestController
 public class AvisoViagemController {
@@ -40,12 +41,18 @@ public class AvisoViagemController {
                                               HttpServletRequest request) {
 
         if (request.getHeader("User-Agent") == null || !Cartao.cartaoValido(idCartao)) {
-            throw new NegocioException("Dados inválidos. " +
-                    "Verifique o número do seu cartão ou se você está ocultando algum dado da requisição.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new Problema(400, "Dados inválidos. Verifique o número do seu cartão ou se você " +
+                            "está ocultando algum dado da requisição."));
         }
 
-        Cartao cartao = cartaoRepository.findById(idCartao).orElseThrow(
-                () -> new NaoEncontradaException("Cartão não encontrado"));
+        Optional<Cartao> possivelCartao = cartaoRepository.findById(idCartao);
+        if (possivelCartao.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new Problema(404, "Cartão não encontrado"));
+        }
+
+        Cartao cartao = possivelCartao.get();
 
         AvisoViagem avisoViagem = avisoViagemRequest.toModel(
                 request.getRemoteAddr(),

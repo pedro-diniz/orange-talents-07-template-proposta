@@ -36,7 +36,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         Problema problema = new Problema(
                 status.value(),
-                OffsetDateTime.now(),
                 "Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente.",
                 errors
         );
@@ -51,7 +50,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         Problema problema = new Problema(
                 status.value(),
-                OffsetDateTime.now(),
                 ex.getMessage()
         );
 
@@ -65,7 +63,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         Problema problema = new Problema(
                 status.value(),
-                OffsetDateTime.now(),
                 ex.getMessage()
         );
 
@@ -79,21 +76,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         Problema problema = new Problema(
                 status.value(),
-                OffsetDateTime.now(),
-                ex.getMessage()
-        );
-
-        return handleExceptionInternal(ex, problema, new HttpHeaders(), status, request);
-    }
-
-    @ExceptionHandler(NaoEncontradaException.class)
-    public ResponseEntity<Object> handleNaoEncontrada(NaoEncontradaException ex, WebRequest request) {
-
-        HttpStatus status = HttpStatus.NOT_FOUND;
-
-        Problema problema = new Problema(
-                status.value(),
-                OffsetDateTime.now(),
                 ex.getMessage()
         );
 
