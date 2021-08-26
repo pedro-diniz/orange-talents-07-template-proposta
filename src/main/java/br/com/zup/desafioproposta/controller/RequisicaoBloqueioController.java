@@ -62,8 +62,6 @@ public class RequisicaoBloqueioController {
                 cartao
         );
 
-        requisicaoBloqueioRepository.save(requisicaoBloqueio);
-
         ResponseEntity<?> possivelBloqueio = bloqueiaLegadoCartaoService.bloqueioLegadoCartao(
                 new BloqueioLegadoCartaoRequest("desafio-proposta"), cartao);
 
@@ -72,6 +70,8 @@ public class RequisicaoBloqueioController {
         }
 
         Bloqueio bloqueio = (Bloqueio) possivelBloqueio.getBody();
+
+        requisicaoBloqueioRepository.save(requisicaoBloqueio);
 
         cartao.bloqueia(bloqueio);
         cartaoRepository.save(cartao);

@@ -59,8 +59,6 @@ public class AvisoViagemController {
                 request.getHeader("User-Agent"),
                 cartao);
 
-        avisoViagemRepository.save(avisoViagem);
-
         ResponseEntity possivelAviso = avisoLegadoCartaoService.avisoLegadoCartao(
                 avisoViagemRequest.toLegadoRequest(), cartao);
 
@@ -69,6 +67,8 @@ public class AvisoViagemController {
         }
 
         Aviso aviso = (Aviso) possivelAviso.getBody();
+
+        avisoViagemRepository.save(avisoViagem);
 
         cartao.adicionaAviso(aviso);
         cartaoRepository.save(cartao);

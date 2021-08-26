@@ -76,9 +76,14 @@ public class AssociacaoCarteiraController {
         AssociacaoCarteira associacaoCarteira = associacaoCarteiraRequest.toModel(cartao);
 
         // Faz a associação no sistema legado primeiro
-        Carteira carteira = associacaoCarteiraLegadoService.associacaoCarteiraLegadoCartao(
+        ResponseEntity possivelCarteira = associacaoCarteiraLegadoService.associacaoCarteiraLegadoCartao(
                 associacaoCarteiraRequest, cartao);
-        System.out.println(carteira.toString());
+
+        if (possivelCarteira.getStatusCode() != HttpStatus.OK) {
+            return possivelCarteira;
+        }
+
+        Carteira carteira = (Carteira) possivelCarteira.getBody();
 
         // Se estiver tudo ok, salva a associação no sistema local
         associacaoCarteiraRepository.save(associacaoCarteira);
