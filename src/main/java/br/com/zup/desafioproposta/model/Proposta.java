@@ -1,5 +1,6 @@
 package br.com.zup.desafioproposta.model;
 
+import br.com.zup.desafioproposta.config.security.data.JasyptConfig;
 import br.com.zup.desafioproposta.controller.dto.response.PropostaResponse;
 import br.com.zup.desafioproposta.service.analiseCredito.AnaliseCreditoRequest;
 import br.com.zup.desafioproposta.service.associaCartao.AssociaCartaoRequest;
@@ -7,7 +8,6 @@ import br.com.zup.desafioproposta.service.associaCartao.AssociaCartaoRequest;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
-import java.util.Base64;
 
 @Entity
 public class Proposta {
@@ -17,6 +17,9 @@ public class Proposta {
 
     @NotBlank
     private String documento;
+
+    @NotBlank
+    private String documentoHash;
 
     @NotBlank
     private String email;
@@ -34,7 +37,8 @@ public class Proposta {
     private EstadoProposta estadoProposta;
 
     public Proposta(String documento, String email, String nome, Endereco endereco, BigDecimal salario) {
-        this.documento = encoda(documento);
+        this.documento = criptografa(documento);
+        this.documentoHash = hasheia(documento);
         this.email = email;
         this.nome = nome;
         this.endereco = endereco;
@@ -72,7 +76,7 @@ public class Proposta {
 
     public AnaliseCreditoRequest toAnaliseDeCredito() {
         return new AnaliseCreditoRequest(
-                decoda(documento),
+                descriptografa(documento),
                 nome,
                 String.valueOf(id)
         );
@@ -80,7 +84,7 @@ public class Proposta {
 
     public AssociaCartaoRequest toAssociacao() {
         return new AssociaCartaoRequest(
-                decoda(documento),
+                descriptografa(documento),
                 nome,
                 String.valueOf(id)
         );
@@ -91,7 +95,7 @@ public class Proposta {
 
     public PropostaResponse toResponse() {
         return new PropostaResponse(
-                decoda(documento),
+                descriptografa(documento),
                 email,
                 nome,
                 endereco,
@@ -100,11 +104,15 @@ public class Proposta {
         );
     }
 
-    private String encoda(String documento) {
-        return Base64.getEncoder().encodeToString(documento.getBytes());
+    private String hasheia(String documento) {
+        return new JasyptConfig().gerarHash(documento);
     }
 
-    private String decoda(String documento) {
-        return new String(Base64.getDecoder().decode(documento));
+    private String criptografa(String documento) {
+        return new JasyptConfig().criptografar(documento);
+    }
+
+    private String descriptografa(String documento) {
+        return new JasyptConfig().descriptografar(documento);
     }
 }

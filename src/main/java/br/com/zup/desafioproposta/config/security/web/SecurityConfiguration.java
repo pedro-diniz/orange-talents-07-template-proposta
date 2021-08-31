@@ -1,4 +1,4 @@
-package br.com.zup.desafioproposta.config.security;
+package br.com.zup.desafioproposta.config.security.web;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

@@ -51,7 +51,6 @@ public class PropostaController {
         else {
             proposta.tornaClienteInelegivel();
         }
-
         propostaRepository.save(proposta);
 
         return ResponseEntity.created(

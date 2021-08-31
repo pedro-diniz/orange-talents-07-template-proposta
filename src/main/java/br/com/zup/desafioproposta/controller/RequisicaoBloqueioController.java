@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,9 +35,11 @@ public class RequisicaoBloqueioController {
     }
 
     @GetMapping("/cartoes/{idCartao}/requisicoesBloqueio")
-    public ResponseEntity<?> requererBloqueio(@PathVariable String idCartao, HttpServletRequest request) {
+    public ResponseEntity<?> requererBloqueio(@PathVariable String idCartao,
+                                              @RequestHeader(value = "User-Agent", required = true) String userAgent,
+                                              HttpServletRequest request) {
 
-        if (request.getHeader("User-Agent") == null || !Cartao.cartaoValido(idCartao)) {
+        if (!Cartao.cartaoValido(idCartao)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Problema(400, "Dados inválidos." +
                     " Verifique o número do seu cartão ou se você está ocultando algum dado da requisição."));
         }
@@ -56,11 +59,7 @@ public class RequisicaoBloqueioController {
             }
         }
 
-        RequisicaoBloqueio requisicaoBloqueio = new RequisicaoBloqueio(
-                request.getRemoteAddr(),
-                request.getHeader("User-Agent"),
-                cartao
-        );
+        RequisicaoBloqueio requisicaoBloqueio = new RequisicaoBloqueio(request.getRemoteAddr(), userAgent, cartao);
 
         ResponseEntity<?> possivelBloqueio = bloqueiaLegadoCartaoService.bloqueioLegadoCartao(
                 new BloqueioLegadoCartaoRequest("desafio-proposta"), cartao);
