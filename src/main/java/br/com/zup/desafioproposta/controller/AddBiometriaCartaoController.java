@@ -6,7 +6,8 @@ import br.com.zup.desafioproposta.model.Biometria;
 import br.com.zup.desafioproposta.model.Cartao;
 import br.com.zup.desafioproposta.repository.BiometriaRepository;
 import br.com.zup.desafioproposta.repository.CartaoRepository;
-import org.springframework.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,8 +21,9 @@ import java.util.Optional;
 @RestController
 public class AddBiometriaCartaoController {
 
-    private BiometriaRepository biometriaRepository;
-    private CartaoRepository cartaoRepository;
+    private final BiometriaRepository biometriaRepository;
+    private final CartaoRepository cartaoRepository;
+    private final Logger logger = LoggerFactory.getLogger(AddBiometriaCartaoController.class);
 
     public AddBiometriaCartaoController(BiometriaRepository biometriaRepository, CartaoRepository cartaoRepository) {
         this.biometriaRepository = biometriaRepository;
@@ -32,17 +34,26 @@ public class AddBiometriaCartaoController {
     public ResponseEntity<?> adicionarBiometria (UriComponentsBuilder uriBuilder, @PathVariable String idCartao,
                                                  @RequestBody @Valid BiometriaRequest biometriaRequest) {
 
-        Optional<Cartao> possivelCartao = cartaoRepository.findById(idCartao);
-        if (possivelCartao.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    new Problema(404, "Cartão não encontrado"));
+        if (!Cartao.cartaoValido(idCartao)) {
+            logger.warn("Cartão inválido");
+            return Problema.badRequest("Dados inválidos. Verifique o número do seu cartão.");
         }
 
+        logger.info("Buscando o cartão");
+        Optional<Cartao> possivelCartao = cartaoRepository.findById(idCartao);
+        if (possivelCartao.isEmpty()) {
+            logger.warn("Cartão não encontrado");
+            return Problema.notFound("Cartão não encontrado");
+        }
         Cartao cartao = possivelCartao.get();
+        logger.info("Cartão encontrado");
 
         Biometria biometria = biometriaRequest.toModel(cartao);
+        logger.info("Biometria criada");
         biometriaRepository.save(biometria);
+        logger.info("Biometria salva");
 
+        // Retorno HTTP 201 com o ID da biometria gerada
         return ResponseEntity.created(
                 uriBuilder.path("/cartoes/"+idCartao+"/biometrias/{id}").buildAndExpand(biometria.getId()).toUri())
                 .build();

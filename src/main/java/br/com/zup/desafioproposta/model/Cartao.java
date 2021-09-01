@@ -150,6 +150,18 @@ public class Cartao {
         this.estadoCartao = EstadoCartao.BLOQUEADO;
     }
 
+    public boolean estaBloqueado() {
+        if (estadoCartao == EstadoCartao.BLOQUEADO) {
+            return true;
+        }
+        for (Bloqueio bloqueio: bloqueios) {
+            if (bloqueio.getAtivo()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void adicionaAviso(Aviso aviso) {
         avisos.add(aviso);
     }

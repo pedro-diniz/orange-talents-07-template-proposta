@@ -2,7 +2,6 @@ package br.com.zup.desafioproposta.controller.dto.request;
 
 import br.com.zup.desafioproposta.config.validation.CpfOuCnpj;
 import br.com.zup.desafioproposta.config.validation.UniqueDocument;
-import br.com.zup.desafioproposta.config.validation.UniqueValue;
 import br.com.zup.desafioproposta.model.Proposta;
 
 import javax.validation.Valid;

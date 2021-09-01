@@ -2,6 +2,8 @@ package br.com.zup.desafioproposta.config.validation;
 
 import br.com.zup.desafioproposta.config.exception.EntidadeImprocessavelException;
 import br.com.zup.desafioproposta.config.security.data.JasyptConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
@@ -13,12 +15,14 @@ import java.util.List;
 
 public class UniqueDocumentValidator implements ConstraintValidator<UniqueDocument, String> {
 
+    private final Logger logger = LoggerFactory.getLogger(UniqueDocumentValidator.class);
+
     @PersistenceContext
     private EntityManager entityManager;
 
     @Override
     public boolean isValid(String documento, ConstraintValidatorContext context) {
-        // query para buscar o domainAttribute na entidade klass.
+        // query para buscar a proposta referente ao documento
         Query query = entityManager.createQuery("select 1 from Proposta where documentoHash = :doc");
 
         // configuração do parâmetro da query
@@ -31,9 +35,11 @@ public class UniqueDocumentValidator implements ConstraintValidator<UniqueDocume
         Assert.state(list.size() <= 1, "Foi encontrado mais de um registro para o documento = :value");
 
         if (list.isEmpty()) {
+            logger.info("Documento válido");
             return true;
         }
         else {
+            logger.warn("Documento já cadastrado");
             throw new EntidadeImprocessavelException("Já existe uma proposta para este documento");
         }
     }

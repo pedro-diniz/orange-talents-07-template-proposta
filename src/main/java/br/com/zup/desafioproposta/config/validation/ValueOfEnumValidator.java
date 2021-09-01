@@ -1,5 +1,8 @@
 package br.com.zup.desafioproposta.config.validation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.List;
@@ -9,6 +12,8 @@ import java.util.stream.Stream;
 public class ValueOfEnumValidator implements ConstraintValidator<ValueOfEnum, Object> {
 
     private List<String> acceptedValues;
+
+    private final Logger logger = LoggerFactory.getLogger(ValueOfEnumValidator.class);
 
     @Override
     public void initialize(ValueOfEnum toValidate) {
@@ -26,9 +31,11 @@ public class ValueOfEnumValidator implements ConstraintValidator<ValueOfEnum, Ob
             String inputAparado = inputString.trim();
             String inputTratado = inputAparado.toUpperCase();
 
+            logger.info("Input compatível com opções do Enum");
             return acceptedValues.contains(inputTratado);
         }
 
+        logger.warn("Input incompatível com opções do Enum");
         return false;
 
     }

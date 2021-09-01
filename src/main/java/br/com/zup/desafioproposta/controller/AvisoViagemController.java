@@ -8,12 +8,11 @@ import br.com.zup.desafioproposta.repository.AvisoViagemRepository;
 import br.com.zup.desafioproposta.repository.CartaoRepository;
 import br.com.zup.desafioproposta.service.associaCartao.Aviso;
 import br.com.zup.desafioproposta.service.avisoLegadoCartao.AvisoLegadoCartaoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -22,9 +21,10 @@ import java.util.Optional;
 @RestController
 public class AvisoViagemController {
 
-    private CartaoRepository cartaoRepository;
-    private AvisoViagemRepository avisoViagemRepository;
-    private AvisoLegadoCartaoService avisoLegadoCartaoService;
+    private final CartaoRepository cartaoRepository;
+    private final AvisoViagemRepository avisoViagemRepository;
+    private final AvisoLegadoCartaoService avisoLegadoCartaoService;
+    private final Logger logger = LoggerFactory.getLogger(AvisoViagemController.class);
 
     public AvisoViagemController(CartaoRepository cartaoRepository,
                                  AvisoViagemRepository avisoViagemRepository,
@@ -37,42 +37,50 @@ public class AvisoViagemController {
 
     @PostMapping("/cartoes/{idCartao}/viagens")
     public ResponseEntity<?> criarAvisoViagem(@PathVariable String idCartao,
+                                              @RequestHeader(value = "User-Agent") String userAgent,
                                               @RequestBody @Valid AvisoViagemRequest avisoViagemRequest,
                                               HttpServletRequest request) {
 
-        if (request.getHeader("User-Agent") == null || !Cartao.cartaoValido(idCartao)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new Problema(400, "Dados inválidos. Verifique o número do seu cartão ou se você " +
-                            "está ocultando algum dado da requisição."));
+        if (!Cartao.cartaoValido(idCartao)) {
+            logger.warn("Cartão inválido");
+            return Problema.badRequest("Dados inválidos. Verifique o número do seu cartão.");
         }
 
+        logger.info("Buscando o cartão");
         Optional<Cartao> possivelCartao = cartaoRepository.findById(idCartao);
         if (possivelCartao.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    new Problema(404, "Cartão não encontrado"));
+            logger.warn("Cartão não encontrado");
+            return Problema.notFound("Cartão não encontrado");
         }
-
         Cartao cartao = possivelCartao.get();
+        logger.info("Cartão encontrado");
 
-        AvisoViagem avisoViagem = avisoViagemRequest.toModel(
-                request.getRemoteAddr(),
-                request.getHeader("User-Agent"),
-                cartao);
+        AvisoViagem avisoViagem = avisoViagemRequest.toModel(request.getRemoteAddr(), userAgent, cartao);
+        logger.info("Aviso de viagem gerado");
 
-        ResponseEntity possivelAviso = avisoLegadoCartaoService.avisoLegadoCartao(
+        logger.info("Aviso de viagem enviado para o sistema legado");
+        ResponseEntity<?> possivelAviso = avisoLegadoCartaoService.avisoLegadoCartao(
                 avisoViagemRequest.toLegadoRequest(), cartao);
 
+        // Verifico se a comunicação correu com o sistema legado correu bem.
+            // Se o status não for OK, o retorno é Problema. Nesse caso, retorno-o.
         if (possivelAviso.getStatusCode() != HttpStatus.OK) {
             return possivelAviso;
         }
 
         Aviso aviso = (Aviso) possivelAviso.getBody();
+        logger.info("Aviso de viagem processado com sucesso pelo sistema legado");
 
         avisoViagemRepository.save(avisoViagem);
+        logger.info("Aviso de viagem salvo com sucesso no sistema local");
 
         cartao.adicionaAviso(aviso);
-        cartaoRepository.save(cartao);
+        logger.info("Aviso de viagem adicionado com sucesso ao cartão no sistema legado");
 
+        cartaoRepository.save(cartao);
+        logger.info("Aviso de viagem salvo com sucesso no sistema legado");
+
+        // Retorno HTTP 200
         return ResponseEntity.ok().build();
     }
 

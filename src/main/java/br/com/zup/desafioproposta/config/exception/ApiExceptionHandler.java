@@ -82,6 +82,19 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, problema, new HttpHeaders(), status, request);
     }
 
+    @ExceptionHandler(ServidorInternoException.class)
+    public ResponseEntity<Object> handleServidorInterno(ServidorInternoException ex, WebRequest request) {
+
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        Problema problema = new Problema(
+                status.value(),
+                ex.getMessage()
+        );
+
+        return handleExceptionInternal(ex, problema, new HttpHeaders(), status, request);
+    }
+
     // Constrói o ValidationErrorOutputDto a partir das listas de erros
     public ValidationErrorOutputDto buildValidationErrors(
             List<ObjectError> globalErrors, List<FieldError> fieldErrors) {

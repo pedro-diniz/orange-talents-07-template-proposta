@@ -9,6 +9,8 @@ import br.com.zup.desafioproposta.repository.AssociacaoCarteiraRepository;
 import br.com.zup.desafioproposta.repository.CartaoRepository;
 import br.com.zup.desafioproposta.service.associaCartao.Carteira;
 import br.com.zup.desafioproposta.service.carteiraLegadoCartao.AssociacaoCarteiraLegadoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +27,10 @@ import java.util.Optional;
 @RestController
 public class AssociacaoCarteiraController {
 
-    private CartaoRepository cartaoRepository;
-    private AssociacaoCarteiraRepository associacaoCarteiraRepository;
-    private AssociacaoCarteiraLegadoService associacaoCarteiraLegadoService;
+    private final CartaoRepository cartaoRepository;
+    private final AssociacaoCarteiraRepository associacaoCarteiraRepository;
+    private final AssociacaoCarteiraLegadoService associacaoCarteiraLegadoService;
+    private final Logger logger = LoggerFactory.getLogger(AssociacaoCarteiraController.class);
 
     public AssociacaoCarteiraController(CartaoRepository cartaoRepository,
                                         AssociacaoCarteiraRepository associacaoCarteiraRepository,
@@ -41,58 +43,58 @@ public class AssociacaoCarteiraController {
     @PostMapping("/cartoes/{idCartao}/carteiras")
     public ResponseEntity<?> associarCarteira(@PathVariable String idCartao,
                                               @RequestBody @Valid AssociacaoCarteiraRequest associacaoCarteiraRequest,
-                                              HttpServletRequest request,
                                               UriComponentsBuilder uriComponentsBuilder) {
 
-        // Verifica se o ID do cartão passado na URL é válido
         if (!Cartao.cartaoValido(idCartao)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new Problema(400, "Verifique o número do seu cartão"));
+            logger.warn("Cartão inválido");
+            return Problema.badRequest("Verifique o número do seu cartão");
         }
 
-        // Procura o cartão pelo ID e retorna uma exceção caso não o encontre
+        logger.info("Buscando o cartão");
         Optional<Cartao> possivelCartao = cartaoRepository.findById(idCartao);
         if (possivelCartao.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    new Problema(404, "Cartão não encontrado"));
+            logger.warn("Cartão não encontrado");
+            return Problema.notFound("Cartão não encontrado");
         }
-
         Cartao cartao = possivelCartao.get();
+        logger.info("Cartão encontrado");
 
-        // Vê quantos vínculos esse cartão já possui nessa carteira
+        logger.info("Buscando vínculos");
         Long vinculos = associacaoCarteiraRepository.countByCartao_IdAndTipoCarteira(
                 idCartao,
                 TipoCarteira.valueOf(associacaoCarteiraRequest.getCarteira())
         );
 
-        // Retorna 422 se já houver um vínculo deste cartão a esta carteira
         if (vinculos > 0) {
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(
-                    new Problema(422, "Este cartão já está vinculado a esta carteira")
-            );
+            logger.warn("Cartão já vinculado a uma carteira deste tipo");
+            return Problema.unprocessableEntity("Este cartão já está vinculado a esta carteira");
         }
+        logger.info("Nenhum vínculo encontrado");
 
-        // Gera uma associação de carteira a partir da requisição
         AssociacaoCarteira associacaoCarteira = associacaoCarteiraRequest.toModel(cartao);
+        logger.info("Associação de carteira gerada");
 
-        // Faz a associação no sistema legado primeiro
-        ResponseEntity possivelCarteira = associacaoCarteiraLegadoService.associacaoCarteiraLegadoCartao(
+        logger.info("Associação enviada para o sistema legado");
+        ResponseEntity<?> possivelCarteira = associacaoCarteiraLegadoService.associacaoCarteiraLegadoCartao(
                 associacaoCarteiraRequest, cartao);
 
+        // Verifico se a comunicação correu com o sistema legado correu bem.
+            // Se o status não for OK, o retorno é Problema. Nesse caso, retorno-o.
         if (possivelCarteira.getStatusCode() != HttpStatus.OK) {
             return possivelCarteira;
         }
 
         Carteira carteira = (Carteira) possivelCarteira.getBody();
+        logger.info("Associação processada com sucesso pelo sistema legado");
 
-        // Se estiver tudo ok, salva a associação no sistema local
         associacaoCarteiraRepository.save(associacaoCarteira);
+        logger.info("Associação de carteira salva com sucesso no sistema local");
 
-        // Vinculo o cartão à carteira do sistema legado
         cartao.vinculaCarteira(carteira);
+        logger.info("Associação vinculada com sucesso ao cartão no sistema legado");
 
-        // Salva a carteira do sistema legado
         cartaoRepository.save(cartao);
+        logger.info("Associação de carteira salva com sucesso no sistema legado");
 
         // Workaround para conseguir enviar a URI da carteira
         List<Carteira> aux = new ArrayList<>(cartao.getCarteiras());
