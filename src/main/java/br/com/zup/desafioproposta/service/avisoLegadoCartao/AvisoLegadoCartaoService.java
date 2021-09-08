@@ -1,6 +1,6 @@
 package br.com.zup.desafioproposta.service.avisoLegadoCartao;
 
-import br.com.zup.desafioproposta.config.exception.Problema;
+import br.com.zup.desafioproposta.config.exception.ProblemaHttp;
 import br.com.zup.desafioproposta.model.Cartao;
 import br.com.zup.desafioproposta.service.associaCartao.Aviso;
 import org.slf4j.Logger;
@@ -47,7 +47,7 @@ public class AvisoLegadoCartaoService {
             }
             else {
                 logger.warn("Aviso de viagem não pôde ser processado");
-                return Problema.unprocessableEntity("Aviso de viagem não pôde ser processado.");
+                return ProblemaHttp.UNPROCESSABLE_ENTITY.getResponse("Aviso de viagem não pôde ser processado.");
             }
 
         }
@@ -55,25 +55,25 @@ public class AvisoLegadoCartaoService {
         catch (HttpClientErrorException e) {
             e.printStackTrace();
             logger.error("Erro 4xx na comunicação com sistema legado");
-            return Problema.badRequest("Erro na comunicação com o sistema legado");
+            return ProblemaHttp.BAD_REQUEST.getResponse("Erro na comunicação com o sistema legado");
         }
 
         catch (HttpServerErrorException e) {
             e.printStackTrace();
             logger.error("Erro 5xx na comunicação com sistema legado");
-            return Problema.internalServerError("Erro interno no sistema de aviso de viagens");
+            return ProblemaHttp.INTERNAL_SERVER_ERROR.getResponse("Erro interno no sistema de aviso de viagens");
         }
 
         catch (ResourceAccessException e) {
             e.printStackTrace();
             logger.error("Conexão recusada com o sistema legado");
-            return Problema.serviceUnavailable("Conexão recusada com o sistema de aviso de viagens");
+            return ProblemaHttp.SERVICE_UNAVAIABLE.getResponse("Conexão recusada com o sistema de aviso de viagens");
         }
 
         catch (Exception e) {
             e.printStackTrace();
             logger.error("Exceção desconhecida lançada na comunicação com sistema legado");
-            return Problema.internalServerError("Algo deu muito ruim!");
+            return ProblemaHttp.INTERNAL_SERVER_ERROR.getResponse("Algo deu muito ruim!");
         }
 
     }

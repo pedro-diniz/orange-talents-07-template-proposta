@@ -1,6 +1,6 @@
 package br.com.zup.desafioproposta.controller;
 
-import br.com.zup.desafioproposta.config.exception.Problema;
+import br.com.zup.desafioproposta.config.exception.ProblemaHttp;
 import br.com.zup.desafioproposta.controller.dto.request.AssociacaoCarteiraRequest;
 import br.com.zup.desafioproposta.model.AssociacaoCarteira;
 import br.com.zup.desafioproposta.model.Cartao;
@@ -47,14 +47,14 @@ public class AssociacaoCarteiraController {
 
         if (!Cartao.cartaoValido(idCartao)) {
             logger.warn("Cartão inválido");
-            return Problema.badRequest("Verifique o número do seu cartão");
+            return ProblemaHttp.BAD_REQUEST.getResponse("Verifique o número do seu cartão");
         }
 
         logger.info("Buscando o cartão");
         Optional<Cartao> possivelCartao = cartaoRepository.findById(idCartao);
         if (possivelCartao.isEmpty()) {
             logger.warn("Cartão não encontrado");
-            return Problema.notFound("Cartão não encontrado");
+            return ProblemaHttp.NOT_FOUND.getResponse("Cartão não encontrado");
         }
         Cartao cartao = possivelCartao.get();
         logger.info("Cartão encontrado");
@@ -67,7 +67,7 @@ public class AssociacaoCarteiraController {
 
         if (vinculos > 0) {
             logger.warn("Cartão já vinculado a uma carteira deste tipo");
-            return Problema.unprocessableEntity("Este cartão já está vinculado a esta carteira");
+            return ProblemaHttp.UNPROCESSABLE_ENTITY.getResponse("Este cartão já está vinculado a esta carteira");
         }
         logger.info("Nenhum vínculo encontrado");
 

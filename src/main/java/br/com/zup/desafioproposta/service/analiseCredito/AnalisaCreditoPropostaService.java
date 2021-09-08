@@ -1,6 +1,6 @@
 package br.com.zup.desafioproposta.service.analiseCredito;
 
-import br.com.zup.desafioproposta.config.exception.Problema;
+import br.com.zup.desafioproposta.config.exception.ProblemaHttp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -50,30 +50,30 @@ public class AnalisaCreditoPropostaService {
             else if (e instanceof HttpClientErrorException) {
                 e.printStackTrace();
                 logger.error("Erro 4xx na comunicação com sistema legado");
-                return Problema.badRequest("Erro na comunicação com o sistema legado");
+                return ProblemaHttp.BAD_REQUEST.getResponse("Erro na comunicação com o sistema legado");
             }
             else if (e instanceof HttpServerErrorException) {
                 e.printStackTrace();
                 logger.error("Erro 5xx na comunicação com sistema legado");
-                return Problema.internalServerError("Erro interno no sistema de análise de crédito");
+                return ProblemaHttp.INTERNAL_SERVER_ERROR.getResponse("Erro interno no sistema de análise de crédito");
             }
             else {
                 e.printStackTrace();
                 logger.error("Exceção HTTP desconhecida lançada na comunicação com sistema legado");
-                return Problema.internalServerError("Exceção desconhecida");
+                return ProblemaHttp.INTERNAL_SERVER_ERROR.getResponse("Exceção desconhecida");
             }
         }
 
         catch (ResourceAccessException e) {
             e.printStackTrace();
             logger.error("Conexão recusada com o sistema legado");
-            return Problema.serviceUnavailable("Conexão recusada com o sistema de análise de crédito");
+            return ProblemaHttp.SERVICE_UNAVAIABLE.getResponse("Conexão recusada com o sistema de análise de crédito");
         }
 
         catch (Exception e) {
             e.printStackTrace();
             logger.error("Exceção desconhecida lançada na comunicação com sistema legado");
-            return Problema.internalServerError("Algo deu muito ruim!");
+            return ProblemaHttp.INTERNAL_SERVER_ERROR.getResponse("Algo deu muito ruim!");
         }
 
     }

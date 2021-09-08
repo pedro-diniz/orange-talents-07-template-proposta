@@ -1,6 +1,6 @@
 package br.com.zup.desafioproposta.controller;
 
-import br.com.zup.desafioproposta.config.exception.Problema;
+import br.com.zup.desafioproposta.config.exception.ProblemaHttp;
 import br.com.zup.desafioproposta.controller.dto.request.PropostaRequest;
 import br.com.zup.desafioproposta.service.analiseCredito.AnaliseCreditoProposta;
 import br.com.zup.desafioproposta.model.Proposta;
@@ -88,7 +88,7 @@ public class PropostaController {
         logger.warn("Proposta não encontrada");
 
         // Retorno HTTP 404 quando a proposta não existir
-        return Problema.notFound("Proposta não encontrada");
+        return ProblemaHttp.NOT_FOUND.getResponse("Proposta não encontrada");
 
     }
 }

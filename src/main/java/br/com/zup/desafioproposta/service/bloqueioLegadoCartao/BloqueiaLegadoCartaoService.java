@@ -1,6 +1,6 @@
 package br.com.zup.desafioproposta.service.bloqueioLegadoCartao;
 
-import br.com.zup.desafioproposta.config.exception.Problema;
+import br.com.zup.desafioproposta.config.exception.ProblemaHttp;
 import br.com.zup.desafioproposta.model.Cartao;
 import br.com.zup.desafioproposta.service.associaCartao.Bloqueio;
 import org.slf4j.Logger;
@@ -45,32 +45,32 @@ public class BloqueiaLegadoCartaoService {
             }
             else {
                 logger.warn("Cartão já está bloqueado");
-                return Problema.unprocessableEntity("Este cartão já está bloqueado");
+                return ProblemaHttp.UNPROCESSABLE_ENTITY.getResponse("Este cartão já está bloqueado");
             }
         }
 
         catch (HttpClientErrorException e) {
             e.printStackTrace();
             logger.error("Erro 4xx na comunicação com sistema legado");
-            return Problema.badRequest("Erro na comunicação com o sistema legado");
+            return ProblemaHttp.BAD_REQUEST.getResponse("Erro na comunicação com o sistema legado");
         }
 
         catch (HttpServerErrorException e) {
             e.printStackTrace();
             logger.error("Erro 5xx na comunicação com sistema legado");
-            return Problema.internalServerError("Erro interno sistema de bloqueio de cartões");
+            return ProblemaHttp.INTERNAL_SERVER_ERROR.getResponse("Erro interno sistema de bloqueio de cartões");
         }
 
         catch (ResourceAccessException e) {
             e.printStackTrace();
             logger.error("Conexão recusada com o sistema legado");
-            return Problema.serviceUnavailable("Conexão recusada com o sistema de bloqueio de cartões");
+            return ProblemaHttp.SERVICE_UNAVAIABLE.getResponse("Conexão recusada com o sistema de bloqueio de cartões");
         }
 
         catch (Exception e) {
             e.printStackTrace();
             logger.error("Exceção desconhecida lançada na comunicação com sistema legado");
-            return Problema.internalServerError("Algo deu muito ruim!");
+            return ProblemaHttp.INTERNAL_SERVER_ERROR.getResponse("Algo deu muito ruim!");
         }
 
     }

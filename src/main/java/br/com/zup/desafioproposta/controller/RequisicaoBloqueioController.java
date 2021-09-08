@@ -1,6 +1,6 @@
 package br.com.zup.desafioproposta.controller;
 
-import br.com.zup.desafioproposta.config.exception.Problema;
+import br.com.zup.desafioproposta.config.exception.ProblemaHttp;
 import br.com.zup.desafioproposta.model.Cartao;
 import br.com.zup.desafioproposta.model.RequisicaoBloqueio;
 import br.com.zup.desafioproposta.repository.CartaoRepository;
@@ -43,21 +43,21 @@ public class RequisicaoBloqueioController {
 
         if (!Cartao.cartaoValido(idCartao)) {
             logger.warn("Cartão inválido");
-            return Problema.badRequest("Dados inválidos. Verifique o número do seu cartão.");
+            return ProblemaHttp.BAD_REQUEST.getResponse("Dados inválidos. Verifique o número do seu cartão.");
         }
 
         logger.info("Buscando o cartão");
         Optional<Cartao> possivelCartao = cartaoRepository.findById(idCartao);
         if (possivelCartao.isEmpty()) {
             logger.warn("Cartão não encontrado");
-            return Problema.notFound("Cartão não encontrado");
+            return ProblemaHttp.NOT_FOUND.getResponse("Cartão não encontrado");
         }
         Cartao cartao = possivelCartao.get();
         logger.info("Cartão encontrado");
 
         if (cartao.estaBloqueado()) {
             logger.warn("Cartão já está bloqueado");
-            return Problema.unprocessableEntity("Este cartão já está bloqueado");
+            return ProblemaHttp.UNPROCESSABLE_ENTITY.getResponse("Este cartão já está bloqueado");
         }
 
 

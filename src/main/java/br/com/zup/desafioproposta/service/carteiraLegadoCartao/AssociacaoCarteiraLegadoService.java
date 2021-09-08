@@ -1,6 +1,6 @@
 package br.com.zup.desafioproposta.service.carteiraLegadoCartao;
 
-import br.com.zup.desafioproposta.config.exception.Problema;
+import br.com.zup.desafioproposta.config.exception.ProblemaHttp;
 import br.com.zup.desafioproposta.controller.dto.request.AssociacaoCarteiraRequest;
 import br.com.zup.desafioproposta.model.Cartao;
 import br.com.zup.desafioproposta.service.associaCartao.Carteira;
@@ -46,32 +46,32 @@ public class AssociacaoCarteiraLegadoService {
             }
             else {
                 logger.warn("Cartão já vinculado a uma carteira deste tipo");
-                return Problema.unprocessableEntity("Este cartão já está associado a esta carteira");
+                return ProblemaHttp.UNPROCESSABLE_ENTITY.getResponse("Este cartão já está associado a esta carteira");
             }
         }
 
         catch (HttpClientErrorException e) {
             e.printStackTrace();
             logger.error("Erro 4xx na comunicação com sistema legado");
-            return Problema.badRequest("Erro na comunicação com o sistema legado");
+            return ProblemaHttp.BAD_REQUEST.getResponse("Erro na comunicação com o sistema legado");
         }
 
         catch (HttpServerErrorException e) {
             e.printStackTrace();
             logger.error("Erro 5xx na comunicação com sistema legado");
-            return Problema.internalServerError("Erro interno no sistema de associação de carteiras");
+            return ProblemaHttp.INTERNAL_SERVER_ERROR.getResponse("Erro interno no sistema de associação de carteiras");
         }
 
         catch (ResourceAccessException e) {
             e.printStackTrace();
             logger.error("Conexão recusada com o sistema legado");
-            return Problema.serviceUnavailable("Conexão recusada com o sistema de associação de carteiras");
+            return ProblemaHttp.SERVICE_UNAVAIABLE.getResponse("Conexão recusada com o sistema de associação de carteiras");
         }
 
         catch (Exception e) {
             e.printStackTrace();
             logger.error("Exceção desconhecida lançada na comunicação com sistema legado");
-            return Problema.internalServerError("Algo deu muito ruim!");
+            return ProblemaHttp.INTERNAL_SERVER_ERROR.getResponse("Algo deu muito ruim!");
         }
 
     }
